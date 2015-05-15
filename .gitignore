@@ -1,0 +1,6 @@
+pi_code/okanode/public/uploads/*
+pi_code/okanode/public/archive/*
+pi_code/okanode/public/temp/*
+pi_code/okanode/server.log
+pi_code/okanode/error.log
+.DS_Store
