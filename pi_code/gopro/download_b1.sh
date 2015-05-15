@@ -24,17 +24,17 @@ if [ $? -eq 0 ]; then
 		:
 		fileN="${i%.*}"
 		timestamp="$(date +'%H%M')"
-		if [ -e /home/pi/okavango/okanode/public/archive/${todaysDir}/jpg/gopro ]; then 
-			if  ls /home/pi/okavango/okanode/public/archive/${todaysDir}/jpg/gopro/${fileN}right* 1>/dev/null 2>&1 ; then  
+		if [ -e /home/pi/okapi/pi_code/okanode/public/archive/${todaysDir}/jpg/gopro ]; then 
+			if  ls /home/pi/okapi/pi_code/okanode/public/archive/${todaysDir}/jpg/gopro/${fileN}right* 1>/dev/null 2>&1 ; then  
 				echo "File exists, will not download"
-			elif ls /home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}right* 1>/dev/null 2>&1 ; then
+			elif ls /home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}right* 1>/dev/null 2>&1 ; then
 				echo "File exists, will not download"
 			else
 				#curl -s --interface wlan3 "http://10.5.5.9:8080/videos/DCIM/100GOPRO/${i}" > "/home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}right_${todaysDir}${timestamp}.jpg"
 				url -s --interface wlan3 "http://10.5.5.9:8080/videos/DCIM/100GOPRO/${i}" > "/home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}right_${todaysDir}${timestamp}.jpg"
 			fi
 		else
-			if ls /home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}right* 1> /dev/null 2>&1; then
+			if ls /home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}right* 1> /dev/null 2>&1; then
 				echo "File already queued to upload"
 			else	
 				#curl -s --interface wlan3 "http://10.5.5.9:8080/videos/DCIM/100GOPRO/${i}" > "/home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}right_${todaysDir}${timestamp}.jpg"
