@@ -123,6 +123,8 @@ app.get('/resetNetwork', function(req, res){
    });
 });
 
+//Upload forms
+
 app.get('/imageUpload', function(req, res){
    res.sendfile('public/uploadFormImage.html');
 });
@@ -135,6 +137,19 @@ app.get('/sightingUpload', function(req, res){
    res.sendfile('public/uploadFormSighting.html');
 });
 
+//Status report!
+app.get('/status', function(req, res){
+  testConnect(function(){
+    checkIP(function(){
+      res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Current IP:'+ currentIP +' </h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to W2 (right):' + connectedW2 + '</h3></body></html>');
+    });
+  });
+});
+
+//Index
+app.get('/', function(req, res){
+   res.sendfile('public/index.html');
+});
 
 takePic = function(){
     logger.info("Starting the long pic taking process.");
@@ -681,14 +696,7 @@ function saveAttachment(file, name, res) {
         }
 }
 
-//Status report!
-app.get('/status', function(req, res){
-  testConnect(function(){
-    checkIP(function(){
-      res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Current IP:'+ currentIP +' </h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to W2 (right):' + connectedW2 + '</h3></body></html>');
-    });
-  });
-});
+
 
 //---------------------- END OF USEFUL STUFF (REST IS DATE FORMATTING CODE) ------------------------
 
