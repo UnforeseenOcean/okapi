@@ -18,7 +18,7 @@ if [ $? -eq 0 ]; then
 	curl -s  --interface wlan1 "http://10.5.5.9/bacpac/SH?t=hudsuckerw1&p=%01"
 	sleep 8
 	curl -s --interface wlan1 http://10.5.5.9:8080/videos/DCIM/102GOPRO/ > temp2.html
-	files=( $(python /home/pi/okavango/gopro/html_parse.py temp2.html | grep JPG) )
+	files=( $(python /home/pi/okapi/pi_code/gopro/html_parse.py temp2.html | grep JPG) )
 	for i in "${files[@]}"
 	do
 		:
@@ -30,13 +30,13 @@ if [ $? -eq 0 ]; then
 			elif ls /home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}center* >/dev/null 2>&1 ; then
 				echo "File exists, will not download"
 			else
-				curl -s --interface wlan1 "http://10.5.5.9:8080/videos/DCIM/102GOPRO/${i}" > "/home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
+				curl -s --interface wlan1 "http://10.5.5.9:8080/videos/DCIM/102GOPRO/${i}" > "/home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
 			fi
 		else
 			if ls /home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}center* 1> /dev/null 2>&1; then
 				echo "File already queued to upload"
 			else	
-				curl -s --interface wlan1 "http://10.5.5.9:8080/videos/DCIM/102GOPRO/${i}" > "/home/pi/okavango/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
+				curl -s --interface wlan1 "http://10.5.5.9:8080/videos/DCIM/102GOPRO/${i}" > "/home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
 				echo "Downloading ${fileN}"
 			fi
 		fi
