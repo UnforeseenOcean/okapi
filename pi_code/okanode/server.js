@@ -137,7 +137,7 @@ app.get('/sightingUpload', function(req, res){
 
 
 takePic = function(){
-    exec('/home/pi/okavango/gopro/./download_master.sh', function(error, stdout, stderr) {
+    exec('sudo /home/pi/okavango/gopro/./download_master.sh', function(error, stdout, stderr) {
        if (stderr != ""){
         logger.error("Error taking pics: " + stderr);
        } else {
@@ -867,4 +867,5 @@ setInterval(doReport, upFreq);
 // Set up interval to check connection status
 setInterval(checkConnection, 1000);
 doReport();
+takePic();
 
