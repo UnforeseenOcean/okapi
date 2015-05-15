@@ -107,13 +107,13 @@ doReport = function() {
 
 //GoPro Stuff
 app.get('/takePic', function(req, res){
-   exec('/home/pi/okavango/gopro/./download_master.sh', function(error, stdout, stderr) {
+   exec('/home/pi/okapi/pi_code/gopro/./download_master.sh', function(error, stdout, stderr) {
        res.json({output: stdout, error: stderr});
    });
 });
 
 app.get('/resetNetwork', function(req, res){
-   exec('sudo /home/pi/okavango/gopro/./setRoutes.sh', function(error, stdout, stderr) {
+   exec('sudo /home/pi/okapi/pi_code/gopro/./setRoutes.sh', function(error, stdout, stderr) {
        res.json({output: stdout, error: stderr});
        if (stderr == ""){
          logger.info("Restarted network");
@@ -138,7 +138,7 @@ app.get('/sightingUpload', function(req, res){
 
 takePic = function(){
     logger.info("Starting the long pic taking process.");
-    exec('sudo /home/pi/okavango/gopro/./download_master.sh', function(error, stdout, stderr) {
+    exec('sudo /home/pi/okapi/pi_code/gopro/./download_master.sh', function(error, stdout, stderr) {
        if (stderr != ""){
         logger.error("Error taking pics: " + stderr);
        } else {
@@ -186,7 +186,7 @@ checkIP = function(callback){
 }
 
 resetNetwork = function(){
-    exec('sudo /home/pi/okavango/gopro/./setRoutes.sh', function(error, stdout, stderr) {
+    exec('sudo /home/pi/okapi/pi_code/gopro/./setRoutes.sh', function(error, stdout, stderr) {
        if (stderr == ""){
          logger.info("Restarted network");
        } else {
