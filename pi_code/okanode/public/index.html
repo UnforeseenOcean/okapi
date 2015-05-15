@@ -1,16 +1,33 @@
 <html>
 <head>
-
-<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css">
-<link rel="stylesheet" href="css/form.css">
-<script src="js/jquery-2.1.1.min.js"></script>
-<script src="js/jquery.mobile-1.4.3.min.js"></script>
-<script src="js/jquery.form.js"></script> 
+<title>Okaserver 1.1</title>
+<script src="js/jquery-2.1.4.min.js"></script>
 
 </head>
 <body>
 
 <h2>Into The Okavango File Server</h2>
+<img id='last' width='480px' height='320px'>
+<h3 id='gpQCount'>
+<h3 id='gpACount'>
 
+<script type="text/javascript">
+function updateStatus() {
+    $.getJSON('/status', function(data) {
+
+        if (data.lastGp) {
+            var l = data.lastGp;
+            var u = l.replace('public/','');
+            console.log(u);
+            $('#last').attr('src',u)
+        }
+
+        $('#gpQCount').html('GoPro Queue:' + data.gpQCount);
+        $('#gpACount').html('GoPro Archived:' + data.gpACount);
+    })
+}
+updateStatus();
+setInterval(updateStatus, 10 * 1000);
+</script>
 </body>
 </html>

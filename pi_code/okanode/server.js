@@ -45,6 +45,7 @@ app.use(multer({ dest: './uploads/'}))
 
 var filePath = "./public/uploads/"
 var archivePath = "./public/archive/"
+var archiveFolder;
 
 var upDate = new Date();
 
@@ -138,7 +139,7 @@ app.get('/sightingUpload', function(req, res){
 });
 
 //Status report!
-app.get('/status', function(req, res){
+app.get('/cameraStatus', function(req, res){
   testConnect(function(){
     checkIP(function(){
       res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Current IP:'+ currentIP +' </h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to W2 (right):' + connectedW2 + '</h3></body></html>');
@@ -146,10 +147,69 @@ app.get('/status', function(req, res){
   });
 });
 
+app.get('/status', function(req, res){
+   res.send(getStatus());
+});
+
 //Index
 app.get('/', function(req, res){
    res.sendfile('public/index.html');
 });
+
+getStatus = function() {
+  status = {};
+  status.upTime = (upCount * upFreq) / 1000;
+  var gpQdir = "public/uploads/jpg/gopro"
+  //GoPro Q
+  var allFiles = fs.readdirSync(gpQdir);
+  var gpQ = [];
+  for (var i = 0; i < allFiles.length; i++) {
+    if (allFiles[i].toLowerCase().indexOf('.jpg') != -1) {
+      gpQ.push(allFiles[i]);
+    }
+  }
+
+  //count
+  var gpQc = gpQ.length;
+  //last image
+  var lastQ = gpQdir + "/" + gpQ[gpQ.length - 1]
+
+  //archive
+  today = new Date();
+  var dt = today.format("ddmmyy");
+
+  archiveFolder = "./public/archive/" + dt;
+  mkdirSync(archiveFolder);
+  mkdirSync(archiveFolder + "/jpg");
+  mkdirSync(archiveFolder + "/jpg/gopro");
+
+  //GoPro Archive
+  var allFiles = fs.readdirSync(archiveFolder + "/jpg/gopro", '.jpg');
+  var gpA = [];
+  for (var i = 0; i < allFiles.length; i++) {
+    if (allFiles[i].toLowerCase().indexOf('.jpg') != -1) {
+      gpA.push(allFiles[i]);
+    }
+  }
+  //count
+  var gpAc = gpA.length;
+  //last image
+  var lastA = archiveFolder + "/" + gpA[gpA.length - 1]
+
+  status.gpQCount = gpQc;
+  if (gpQc > 0) {
+    status.lastGp = lastQ;
+  }
+  status.gpACount = gpAc;
+  if (gpAc> 0) {
+    status.lastAp = lastA;
+  }
+
+  return(JSON.stringify(status));
+  
+
+
+}
 
 takePic = function(){
     logger.info("Starting the long pic taking process.");
