@@ -455,7 +455,7 @@ resize = function(dirPath, fileName, callback) {
     __newName = __newName.replace('uploads', 'temp')
     console.log("resize name " + __newName);
     logger.info("filename: " + dirPath + fileName);
-    gm(dirPath + fileName).resize(1024).write(__newName, function(err) {
+    gm(dirPath + fileName).resize(800).write(__newName, function(err) {
         if (err) {
             logger.error(err);
             console.log(err);
