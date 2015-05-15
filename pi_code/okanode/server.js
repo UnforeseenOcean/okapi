@@ -137,6 +137,7 @@ app.get('/sightingUpload', function(req, res){
 
 
 takePic = function(){
+    logger.info("Starting the long pic taking process.");
     exec('sudo /home/pi/okavango/gopro/./download_master.sh', function(error, stdout, stderr) {
        if (stderr != ""){
         logger.error("Error taking pics: " + stderr);
