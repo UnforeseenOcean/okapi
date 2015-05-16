@@ -321,9 +321,9 @@ doQueue = function() {
                 }
             }
         }
-        if (goproList.length > 0 && !chk) {
+        if (goproList.length > 1 && !chk) {
 
-            for (var i = 0; i < goproList.length; i++) {
+            for (var i = 1; i < goproList.length; i++) {
                 if (goproList[i].indexOf('jpg') != '-1') {
                     logger.log('info', "Found JPG to upload.");
 

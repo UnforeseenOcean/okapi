@@ -21,6 +21,12 @@ function updateStatus() {
             console.log(u);
             $('#last').attr('src',u)
         }
+        else if (data.lastAp) {
+            var l = data.lastAp;
+            var u = l.replace('public/','');
+            console.log(u);
+            $('#last').attr('src',u)
+        }
 
         $('#gpQCount').html('GoPro Queue:' + data.gpQCount);
         $('#gpACount').html('GoPro Archived:' + data.gpACount);
