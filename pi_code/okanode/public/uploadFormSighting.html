@@ -1,33 +1,54 @@
 <html>
 <head>
+<title>RiverFi Species Observation Upload 1.1</title>
 
 <script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/moment.js"></script>
 <script src="js/jquery.serializejson.min.js"></script>
+<script src="js/jquery.mobile-1.4.3.min.js"></script>
+<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css">
+
 
 <script>
 
 $(document).ready(function() {
 
-    var today = new Date()
-    console.log();
+    $('#test-button').on('click', function () {
+        //console.log($('#date').val().replace('-16', '-15') + " , " + $('#time').val());
+    });
 
-    $('#test').on('click', function () {
+    $('#add-button').on('click', function () {
                 var data = new FormData();
-                var image = $("#Photo").get(0).files;
+                var files = $("#File").get(0).files;
 
-
+                var j = $('#upload').serializeJSON();
+                j.ResourceURLs = [];
 
                 // Add the uploaded file content to the form data collection
-                if (image.length > 0) {
-                    data.append("upload", image[0]);
+                data.append('ImageCount', files.length);
+                for (var i = 0; i < files.length; i++) {
+                    console.log("ADDING IMAGE " + files[i])
+                    data.append("image-" + i, files[i]);
+                    data.append("image-" + i + "-ResourceURL", files[i].name);
+                    j.ResourceURLs.push(files[i].name);
                 }
 
-                var metadata = $('#sightingUpload').serializeJSON()
-                metadata['t_utc'] = Math.floor(today.getTime()/ 1000)
+                //j.ResourceURL = [files[0].name];
+                j.ImageType = "Species";
 
-                var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
+                var dateString = $('#date').val() + " , " + $('#time').val();
+                var date = moment().format();
+                j.t_utc = Math.floor((new Date(date)).getTime() / 1000);
 
-                data.append("metadata", jsonBlob, "metadata.json");
+                //j.t_utc = Math.floor((new Date()).getTime() / 1000);
+
+                var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
+                console.log(jsonBlob);
+
+                data.append("hasJSON", true);
+                data.append("json", jsonBlob, "metadata.json");
+                data.append("TeamMember", $("#TeamMember").val());
+
 
                 var myReader = new FileReader();
                 myReader.onload = function(event){
@@ -35,9 +56,11 @@ $(document).ready(function() {
                 };
                 myReader.readAsText(jsonBlob);
 
+                // Make Ajax request with the contentType = false, and processDate = false
+                $('#message').text('Uploading...');
                 var ajaxRequest = $.ajax({
                     type: "POST",
-                    url: "http://intotheokavango.org/ingest/sighting",
+                    url: "/upload",
                     contentType: false,
                     processData: false,
                     data: data,
@@ -52,6 +75,10 @@ $(document).ready(function() {
 
                 ajaxRequest.done(function (xhr, textStatus) {
                     console.log(textStatus);
+                    $('#message').html(textStatus);
+                    if (textStatus == 'success') {
+                        $(':input','#upload').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
+                    }
                 });
 
 
@@ -60,27 +87,41 @@ $(document).ready(function() {
 })
 
 
-	
+    
 </script>
 
 </head>
 <body>
-<h2>Sighting Upload </h2>
-<form id="sightingUpload">
+<h2>Species Upload </h2>
+<form id="upload">
 
-    <label for="photo">Photo</label>
-    <input type="file" name="Photo" id="Photo" value="">
+    <label for="SpeciesName">Species Name</label>
+    <input type="text" name="SpeciesName" id="SpeciesName" value="">
+
+    <label for="Count">Count</label>
+    <input type="number" name="Count" id="Count" value="">
+
+    <label for="SpecimenID">Specimen ID</label>
+    <input type="text" name="SpecimenID" id="SpecimenID" value="None">
+
+    <label for="photo">File</label>
+    <input type="file" name="File" id="File" value="" multiple>
 
     <label for="TeamMember">Team Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
 
-    <label for="SpeciesName">Species Name</label>
-    <input type="text" name="SpeciesName" id="SpeciesName" value="">
+    <label for="date">Date</label>
+    <input type="date" name="Date" id="date" value="">
+
+    <label for="time">Time</label>
+    <input type="time" name="Time" id="time" value="">
 
     <label for="Notes">Notes</label>
     <input type="text" name="Notes" id="Notes" value="">
 
 </form>
-<div id="test">Click to Submit</div>
+<!--button class="ui-shadow ui-btn ui-corner-all" id="test-button">Test</button-->
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Sighting</button>
+<div id="message"></div>
 </body>
 </html>

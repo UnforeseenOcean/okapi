@@ -16,16 +16,19 @@ $(document).ready(function() {
                 var data = new FormData();
                 var image = $("#Photo").get(0).files;
 
+                var j = $('#upload').serializeJSON();
+                console.log(j);
+                j.ResourceURLs = [];
+
                 // Add the uploaded file content to the form data collection
                 data.append('ImageCount', image.length);
                 for (var i = 0; i < image.length; i++) {
                     console.log("ADDING IMAGE " + image[i])
                     data.append("image-" + i, image[i]);
                     data.append("image-" + i + "-ResourceURL", image[i].name);
+                    j.ResourceURLs.push(image[i].name);
                 }
 
-                var j = $('#imageUpload').serializeJSON();
-                j.ResourceURL = image[0].name;
                 j.ImageType = 'Documentary';
 
                 var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
@@ -60,9 +63,37 @@ $(document).ready(function() {
 
                 ajaxRequest.done(function (xhr, textStatus) {
                     console.log(textStatus);
+                    $('#message').html(textStatus);
+                    if (textStatus == 'success') {
+                        $(':input','#upload').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
+                    }
                 });
 
 
+            });
+
+            $('#species-button').on('click', function () {
+                $('#speciesList').empty();
+                $('#species-button').text('Getting sightings from API...')
+                console.log("Try getting species");
+                //http://intotheokavango.org/api/features/?FeatureType=sighting&order=descending&SpeciesName=Tester+Bird
+                $.getJSON('http://intotheokavango.org/api/features/?Expedition=okavango_15&FeatureType=sighting&order=descending&SpeciesName=' + encodeURI($('#Species').val()), function(data) {
+                        var buttons = [];
+                        for (var i = 0; i < data.results.features.length; i++) {
+                            var f = data.results.features[i];
+                            buttons[i] = $('#speciesList').append('<div id="button' + i + '">' + f.properties.DateTime + '</div>');
+                            $('#button' + i).data('id',f.id ).click(function() {
+                                id = $(this).data('id');
+                                console.log($('#sightingID'));
+                                if (!$('#sightingID').length) {
+                                    $('#upload').append('<input type="text" name="SightingID" id="sightingID" label="Sighting ID">');
+                                }
+                                $('#sightingID').val(id);
+                            });
+
+                        }
+                        $('#species-button').text('Relink Species?')
+                })
             });
 
 })
@@ -74,10 +105,10 @@ $(document).ready(function() {
 </head>
 <body>
 <h2>Image Upload </h2>
-<form id="imageUpload">
+<form id="upload">
 
     <label for="photo">Photo</label>
-    <input type="file" name="Photo" id="Photo" value="">
+    <input type="file" name="Photo" id="Photo" value="" multiple>
 
     <label for="TeamMember">Team Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
@@ -85,7 +116,15 @@ $(document).ready(function() {
     <label for="Notes">Notes</label>
     <input type="text" name="Notes" id="Notes" value="">
 
+    <label for="Species">Species Name</label>
+    <input type="text" name="Species" id="Species" value="">
+
 </form>
-<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Record Observation</button>
+<div id='speciesList'>
+
+</div>
+<button class="ui-shadow ui-btn ui-corner-all" id="species-button">Link Species</button>
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Images</button>
+<h3 id="message"></h3>
 </body>
 </html>

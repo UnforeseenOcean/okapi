@@ -3,6 +3,7 @@
 <title>RiverFi Sound Upload 1.1</title>
 
 <script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/moment.js"></script>
 <script src="js/jquery.serializejson.min.js"></script>
 <script src="js/jquery.mobile-1.4.3.min.js"></script>
 <link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css">
@@ -25,9 +26,14 @@ $(document).ready(function() {
                 }
 
                 var j = $('#upload').serializeJSON();
-                j.ResourceURL = files[0].name;
+                j.ResourceURLs = [files[0].name];
                 j.SoundType = $('#SoundType').val();
-                j.t_utc = Math.floor((new Date()).getTime() / 1000);
+
+                var dateString = $('#date').val() + " , " + $('#time').val();
+                var date = moment().format();
+                j.t_utc = Math.floor((new Date(date)).getTime() / 1000);
+
+                //j.t_utc = Math.floor((new Date()).getTime() / 1000);
 
                 var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
                 console.log(jsonBlob);
@@ -61,6 +67,10 @@ $(document).ready(function() {
 
                 ajaxRequest.done(function (xhr, textStatus) {
                     console.log(textStatus);
+                    $('#message').html(textStatus);
+                    if (textStatus == 'success') {
+                        $(':input','#upload').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
+                    }
                 });
 
 
@@ -80,19 +90,23 @@ $(document).ready(function() {
     <label for="photo">File</label>
     <input type="file" name="File" id="File" value="">
 
-    <label for="SoundType">Team Member</label>
+    <label for="SoundType">Sound Type</label>
     <input type="text" name="SoundType" id="SoundType" value="Field Recording">
 
     <label for="TeamMember">Team Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
 
-    <label for="date">Date</label>
+    <label for="Date">Date</label>
     <input type="date" name="Date" id="date" value="">
+
+    <label for="Time">Time</label>
+    <input type="time" name="Time" id="time" value="">
 
     <label for="Notes">Notes</label>
     <input type="text" name="Notes" id="Notes" value="">
 
 </form>
-<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Record Observation</button>
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Sound</button>
+<div id="message"></div>
 </body>
 </html>
