@@ -552,11 +552,6 @@ attemptUploadJSON = function(url) {
         form.append('json', fs.createReadStream(url));
         if (json.ResourceURLs != null) {
 
-          //do we need resize?
-          if (ingestType == image) {
-            console.log("HERE WE SHOULD RESIZE.")
-          }
-
           for (var i = 0; i < json.ResourceURLs.length; i++) {
             rPath = filePath + ingestPath + "/" + json.ResourceURLs[i];
             console.log("ADDING RESOURCE 1:" + rPath);
