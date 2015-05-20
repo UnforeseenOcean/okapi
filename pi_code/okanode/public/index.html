@@ -27,6 +27,7 @@
 <h3 id='centers'></h3>
 <h3 id='rights'></h3>
 <h3 id='json'></h3>
+<h3 id='lastJson'></h3>
 
 
 
@@ -74,6 +75,10 @@ function updateStatus() {
         $('#centers').html('Centers: ' + data.counts[1] + ":" + data.aCounts[1]);
         $('#rights').html('Rights: ' + data.counts[2] + ":" + data.aCounts[2]);
         $('#json').html('JSON: ' + data.jCounts[0] + ":" + data.jCounts[1]);
+
+        if (data.jsons && data.jsons.length > 0) {
+            $('#lastJson').html('Last: ' + data.jsons[data.jsons.length - 1]);;
+        }
     })
 }
 updateStatus();

@@ -272,6 +272,7 @@ getStatus = function() {
   status.aCounts = [leftACount, centerACount, rightACount];
 
   status.jCounts = [jsonCount, jsonACount];
+  status.jsons = jsons;
   if (gpQc > 0) {
     status.lastGp = lastQ;
   }
