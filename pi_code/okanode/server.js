@@ -711,8 +711,12 @@ archive = function(filePath) {
 	mkdirSync("./public/archive/" + dt + "/tweet");
 
 	var archPath = filePath.replace('uploads', 'archive/' + dt);
-	fs.renameSync(filePath, archPath );
-	logger.info("Archived:" + archPath );
+   try {
+  	fs.renameSync(filePath, archPath );
+  	logger.info("Archived:" + archPath );
+  } catch (err) {
+    console.log("Error archiving");
+  }
 
 	totalOut ++;
 }
