@@ -350,6 +350,7 @@ doQueue = function() {
     if (!sending) {
     	var jsonList = fs.readdirSync(filePath + "json");
     	var goproList = fs.readdirSync(filePath + "jpg/gopro");
+      var jpgList = fs.readdirSync(filePath + "jpg");
     	var mp3List = fs.readdirSync(filePath + "mp3");
         var tweetList = fs.readdirSync(filePath + "tweet");
         var chk = false;
@@ -407,6 +408,38 @@ doQueue = function() {
 
                     var obj = {
                         TeamMember:null,
+                        ImageType:"GoPro",
+                        ResourceURLs:[url]
+
+                    }
+
+                    fs.writeFile(outputFilename, JSON.stringify(obj, null, 4), function(err) {
+                        if(err) {
+                          logger.error(err);
+                          //res.send('Did not get it. :(')
+                        } else {
+                          logger.info("JSON saved to " + outputFilename);
+                          //res.send('Got it!')
+                        }
+                    }); 
+
+                    // *** NEED TO RESIZE 
+                    chk = true;
+                    break;
+                }   
+            }
+            if (jpgList.length > 1 && !chk) {
+
+            for (var i = 0; i < jpgList.length -1; i++) {
+                if (jpgList[i].indexOf('jpg') != '-1') {
+                    logger.log('info', "Found JPG to upload.");
+
+                    var url = jpgList[i];
+
+                    var outputFilename = './public/uploads/json/tablet_' + jpgList[i] + '.json';
+
+                    var obj = {
+                        TeamMember:"Giles",
                         ImageType:"GoPro",
                         ResourceURLs:[url]
 
