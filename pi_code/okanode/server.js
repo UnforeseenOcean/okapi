@@ -685,9 +685,9 @@ attemptUploadJSON = function(url) {
                 }
             } else {
                 logger.error("Could not resize file for upload. Archiving instead");
-                archive(url);
+                //archive(url);
                 for (var i = 0; i < json.ResourceURLs.length ; i++) {
-                  archive(filePath + ingestPath + "/" + json.ResourceURLs[i]);
+                  //archive(filePath + ingestPath + "/" + json.ResourceURLs[i]);
                 }
                 sending = false;
             }
