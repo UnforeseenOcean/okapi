@@ -428,7 +428,8 @@ doQueue = function() {
                     break;
                 }   
             }
-            if (jpgList.length > 1 && !chk) {
+          }
+          if (jpgList.length > 1 && !chk) {
 
             for (var i = 0; i < jpgList.length -1; i++) {
                 if (jpgList[i].indexOf('jpg') != '-1') {
@@ -460,11 +461,8 @@ doQueue = function() {
                     break;
                 }   
             }
+         }   
 
-
-
-            
-        }
     	if (mp3List.length > 0 && !chk) {
     		//Or at last resort, a sound file!
     		for (var i = 0; i < mp3List.length; i++) {
