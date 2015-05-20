@@ -23,25 +23,23 @@ if [ $? -eq 0 ]; then
 	do
 		:
 		fileN="${i%.*}"
-		echo "${fileN}"
 		timestamp="$(date +'%H%M')"
 		if [ -e /home/pi/okapi/pi_code/okanode/public/archive/${todaysDir}/jpg/gopro ]; then 
-                   if  ls /home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center* 1> /dev/null 2>&1 ; then
-                       echo  "File exists, will not download"
-		   elif ls /home/pi/okapi/pi_code/okanode/public/archive/${todaysDir}/jpg/gopro/${fileN}center* 1> /dev/null 2>&1 ; then
-                       echo  "File exists, will not download"
-                   else
-                       curl -s --interface wlan2 "http://10.5.5.9:8080/videos/DCIM/100GOPRO/${i}" > "/home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
-		       echo "Downloading file"
-                   fi
-               else
-                   if ls /home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center* 1> /dev/null 2>&1; then
-                      echo "File queued to upload"
-                   else
-                      curl -s --interface wlan2 "http://10.5.5.9:8080/videos/DCIM/100GOPRO/${i}" > "/home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
-		      echo "Downloading file"
-                   fi
-               fi
+			if  ls /home/pi/okapi/pi_code/okanode/public/archive/${todaysDir}/jpg/gopro/${fileN}center* 1>/dev/null 2>&1 ; then  
+				echo "File exists, will not download"
+			elif ls /home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center* >/dev/null 2>&1 ; then
+				echo "File exists, will not download"
+			else
+				curl -s --interface wlan1 "http://10.5.5.9:8080/videos/DCIM/102GOPRO/${i}" > "/home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
+			fi
+		else
+			if ls /home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center* 1> /dev/null 2>&1; then
+				echo "File already queued to upload"
+			else	
+				curl -s --interface wlan1 "http://10.5.5.9:8080/videos/DCIM/102GOPRO/${i}" > "/home/pi/okapi/pi_code/okanode/public/uploads/jpg/gopro/${fileN}center_${todaysDir}${timestamp}.jpg"
+				echo "Downloading ${fileN}"
+			fi
+		fi
 	done
 	rm temp2.html
 	#turn it off 
