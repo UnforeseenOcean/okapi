@@ -159,26 +159,80 @@ app.get('/', function(req, res){
 getStatus = function() {
   status = {};
   status.upTime = (upCount * upFreq) / 1000;
+
+  var today = new Date();
+  var dt = today.format("ddmmyy");
+
+  var archiveFolder = "./public/archive/" + dt;
+
+
   var gpQdir = "public/uploads/jpg/gopro"
+  var jQdir = "public/uploads/json"
+
+  var lefts = [];
+  var rights = [];
+  var centers = [];
+
+  var leftCount = 0;
+  var rightCount = 0;
+  var centerCount = 0;
+
+  var leftACount = 0;
+  var rightACount = 0;
+  var centerACount = 0;
+
+  var jsonCount = 0;
+  var jsonACount = 0;
+  var jsons = [];
+
+  //JSON
+  var allFiles = fs.readdirSync(jQdir);
+  for (var i = 0; i < allFiles.length; i++) {
+    if (allFiles[i].toLowerCase().indexOf('.json') != -1) {
+      jsons.push(allFiles[i]);
+      jsonCount ++;
+    }
+  }
+
+  //JSON Archive
+  mkdirSync(archiveFolder);
+  mkdirSync(archiveFolder + "/json");
+
+  var allFiles = fs.readdirSync(archiveFolder + "/json");
+  for (var i = 0; i < allFiles.length; i++) {
+    if (allFiles[i].toLowerCase().indexOf('.json') != -1) {
+      jsons.push(allFiles[i]);
+      jsonACount ++;
+    }
+  }
+
   //GoPro Q
   var allFiles = fs.readdirSync(gpQdir);
   var gpQ = [];
   for (var i = 0; i < allFiles.length; i++) {
     if (allFiles[i].toLowerCase().indexOf('.jpg') != -1) {
       gpQ.push(allFiles[i]);
+      if (allFiles[i].indexOf('left') != -1 ) {
+        leftCount ++;
+        lefts.push(gpQdir + "/" + allFiles[i]);
+      }
+      if (allFiles[i].indexOf('right') != -1 ) {
+        rightCount ++;
+        rights.push(gpQdir + "/" + allFiles[i]);
+      }
+      if (allFiles[i].indexOf('center') != -1 ) {
+        centerCount ++;
+        centers.push(gpQdir + "/" + allFiles[i]);
+      }
     }
   }
 
-  //count
+  //GoPro count
   var gpQc = gpQ.length;
   //last image
   var lastQ = gpQdir + "/" + gpQ[gpQ.length - 1]
 
-  //archive
-  today = new Date();
-  var dt = today.format("ddmmyy");
-
-  archiveFolder = "./public/archive/" + dt;
+  //GoPro archive
   mkdirSync(archiveFolder);
   mkdirSync(archiveFolder + "/jpg");
   mkdirSync(archiveFolder + "/jpg/gopro");
@@ -188,15 +242,36 @@ getStatus = function() {
   var gpA = [];
   for (var i = 0; i < allFiles.length; i++) {
     if (allFiles[i].toLowerCase().indexOf('.jpg') != -1) {
+      if (allFiles[i].indexOf('left') != -1 ) {
+        leftACount ++;
+        lefts.push(archiveFolder + "/" + allFiles[i]);
+      }
+      if (allFiles[i].indexOf('right') != -1 ) {
+        rightACount ++;
+        rights.push(archiveFolder + "/" + allFiles[i]);
+      }
+      if (allFiles[i].indexOf('center') != -1 ) {
+        centerACount ++;
+        centers.push(archiveFolder + "/" + allFiles[i]);
+      }
       gpA.push(allFiles[i]);
     }
   }
   //count
   var gpAc = gpA.length;
-  //last image
+  //last images
   var lastA = archiveFolder + "/" + gpA[gpA.length - 1]
 
+  if (lefts.length > 0) status.lastLeft = lefts[lefts.length - 1];
+  if (rights.length > 0) status.lastRight = rights[rights.length - 1];
+  if (centers.length > 0) status.lastCenter = centers[centers.length - 1];
+
+
   status.gpQCount = gpQc;
+  status.counts = [leftCount, centerCount, rightCount];
+  status.aCounts = [leftACount, centerACount, rightACount];
+
+  status.jCounts = [jsonCount, jsonACount];
   if (gpQc > 0) {
     status.lastGp = lastQ;
   }
@@ -206,8 +281,6 @@ getStatus = function() {
   }
 
   return(JSON.stringify(status));
-  
-
 
 }
 
@@ -323,7 +396,7 @@ doQueue = function() {
         }
         if (goproList.length > 1 && !chk) {
 
-            for (var i = 1; i < goproList.length; i++) {
+            for (var i = 0; i < goproList.length -1; i++) {
                 if (goproList[i].indexOf('jpg') != '-1') {
                     logger.log('info', "Found JPG to upload.");
 
@@ -470,28 +543,33 @@ resize = function(dirPath, fileName, callback) {
 resizeMulti = function(dirPath, fileNames, callback) {
    var newNames = [];
    var c = 0;
-   for (var i = 0; i < fileNames.length; i++) {
-      __dirPath = dirPath;
-      __fileName = fileNames[i];
-      fileFront = __fileName.split('.')[0];
-      fileExt = __fileName.split('.')[1];
-      __newName = dirPath + fileFront + "_small." + fileExt;
-      __newName = __newName.replace('uploads', 'temp')
-      newNames.push(__newName);
-      console.log("resize name " + __newName);
-      logger.info("filename: " + dirPath + __fileName);
-      gm(dirPath + __fileName).resize(800).write(__newName, function(err) {
-          if (err) {
-              logger.error(err);
-              console.log(err);
-              callback("Error");
-          } else {
-              c++;
-              if (c == fileNames.length) {
-                callback(newNames);
-              }
-          }
-      });
+   if (fileNames.length > 0) {
+     for (var i = 0; i < fileNames.length; i++) {
+        __dirPath = dirPath;
+        __fileName = fileNames[i];
+        fileFront = __fileName.split('.')[0];
+        fileExt = __fileName.split('.')[1];
+        __newName = dirPath + fileFront + "_small." + fileExt;
+        __newName = __newName.replace('uploads', 'temp')
+        newNames.push(__newName);
+        console.log("resize name " + __newName);
+        logger.info("filename: " + dirPath + __fileName);
+        gm(dirPath + __fileName).resize(800).write(__newName, function(err) {
+            if (err) {
+                logger.error(err);
+                console.log(err);
+                callback("Error");
+            } else {
+                c++;
+                if (c == fileNames.length) {
+                  callback(newNames);
+                }
+            }
+        });
+    }
+  } else {
+    console.log("No files on multi upload.");
+    callback(newNames);
   }
 
 }
@@ -565,6 +643,7 @@ attemptUploadJSON = function(url) {
 
       } else {
         console.log("Attempt resize." + ingestPath + ":" + json.ResourceURLs);
+        
 
           var origPics = [];
         
@@ -589,7 +668,7 @@ attemptUploadJSON = function(url) {
                 var form = r.form();
                 form.append('json', fs.createReadStream(url));
                 for (var i = 0; i < json.ResourceURLs.length; i++) {
-                  if (json.ResourceURLs[i] != null) {
+                  if (json.ResourceURLs[i] != null && json.ResourceURLs.length > 0) {
                       rPath = newNames[i];
                       console.log('Resource Path:' + rPath);
                       origPics.push(filePath + ingestPath + "/" + json.ResourceURLs[i]);
@@ -612,6 +691,7 @@ attemptUploadJSON = function(url) {
                 sending = false;
             }
         });
+
      
     }
         

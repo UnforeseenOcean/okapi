@@ -3,24 +3,56 @@
 <title>Okaserver 1.1</title>
 <script src="js/jquery-2.1.4.min.js"></script>
 
+<style>
+    body { 
+        font-family:Helvetica;
+    }
+</style>
+
 </head>
 <body>
 
 <h2>Into The Okavango File Server</h2>
-<img id='last' width='480px' height='320px'/>
+
+<a href='/imageUpload'>Image Upload</a>
+<a href='/soundUpload'>Sound Upload</a>
+<a href='/sightingUpload'>Sighting/Species Upload</a>
+<br/>
+<br/>
+
+<img id='lastLeft' width='320px' height='280px'/><img id='lastCenter' width='320px' height='280px'/><img id='lastRight' width='320px' height='280px'/>
 <h3 id='gpQCount'></h3>
 <h3 id='gpACount'></h3>
+<h3 id='lefts'></h3>
+<h3 id='centers'></h3>
+<h3 id='rights'></h3>
+<h3 id='json'></h3>
 
-<ul>
-<li><a href='/imageUpload'>Image Upload</a></li>
-<li><a href='/soundUpload'>Sound Upload</a></li>
-<li><a href='/sightingUpload'>Sighting/Species Upload</a></li>
-</ul>
+
 
 <script type="text/javascript">
 function updateStatus() {
     $.getJSON('/status', function(data) {
 
+        console.log(data);
+
+        if (data.lastLeft) {
+            var l = data.lastLeft;
+            var u = l.replace('public/','');
+            $('#lastLeft').attr('src',u)
+        }
+        if (data.lastCenter) {
+            var l = data.lastCenter;
+            var u = l.replace('public/','');
+            $('#lastCenter').attr('src',u)
+        }
+        if (data.lastRight) {
+            var l = data.lastRight;
+            var u = l.replace('public/','');
+            $('#lastRight').attr('src',u)
+        }
+
+        /*
         if (data.lastGp) {
             var l = data.lastGp;
             var u = l.replace('public/','');
@@ -33,9 +65,15 @@ function updateStatus() {
             console.log(u);
             $('#last').attr('src',u)
         }
+        */
 
         $('#gpQCount').html('GoPro Queue:' + data.gpQCount);
         $('#gpACount').html('GoPro Archived:' + data.gpACount);
+
+        $('#lefts').html('Lefts: ' + data.counts[0] + ":" + data.aCounts[0]);
+        $('#centers').html('Centers: ' + data.counts[1] + ":" + data.aCounts[1]);
+        $('#rights').html('Rights: ' + data.counts[2] + ":" + data.aCounts[2]);
+        $('#json').html('JSON: ' + data.jCounts[0] + ":" + data.jCounts[1]);
     })
 }
 updateStatus();
