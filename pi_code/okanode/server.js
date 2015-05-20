@@ -244,15 +244,15 @@ getStatus = function() {
     if (allFiles[i].toLowerCase().indexOf('.jpg') != -1) {
       if (allFiles[i].indexOf('left') != -1 ) {
         leftACount ++;
-        lefts.push(archiveFolder + "/" + allFiles[i]);
+        lefts.push(archiveFolder + "/jpg/gopro/" + allFiles[i]);
       }
       if (allFiles[i].indexOf('right') != -1 ) {
         rightACount ++;
-        rights.push(archiveFolder + "/" + allFiles[i]);
+        rights.push(archiveFolder + "/jpg/gopro/" + allFiles[i]);
       }
       if (allFiles[i].indexOf('center') != -1 ) {
         centerACount ++;
-        centers.push(archiveFolder + "/" + allFiles[i]);
+        centers.push(archiveFolder + "/jpg/gopro/" + allFiles[i]);
       }
       gpA.push(allFiles[i]);
     }
