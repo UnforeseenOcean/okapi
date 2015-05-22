@@ -262,9 +262,9 @@ getStatus = function() {
   //last images
   var lastA = archiveFolder + "/" + gpA[gpA.length - 1]
 
-  if (lefts.length > 0) status.lastLeft = lefts[lefts.length - 1];
-  if (rights.length > 0) status.lastRight = rights[rights.length - 1];
-  if (centers.length > 0) status.lastCenter = centers[centers.length - 1];
+  if (lefts.length > 0) status.lastLeft = lefts[0];
+  if (rights.length > 0) status.lastRight = rights[0];
+  if (centers.length > 0) status.lastCenter = centers[0];
 
 
   status.gpQCount = gpQc;
