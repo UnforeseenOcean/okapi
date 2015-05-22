@@ -402,7 +402,16 @@ doQueue = function() {
                 if (goproList[i].indexOf('jpg') != '-1') {
                     logger.log('info', "Found JPG to upload.");
 
+
+
                     var url = "gopro/" + goproList[i];
+
+                   var stats = fs.statSync(url)
+                   var fileSizeInBytes = stats["size"]
+                   //Convert the file size to megabytes (optional)
+                   var fileSizeInMegabytes = fileSizeInBytes / 1000000.0
+
+                   if (fileSizeInMegabytes > 1.0) {
 
                     var outputFilename = './public/uploads/json/gopro_' + goproList[i] + '.json';
 
@@ -422,6 +431,7 @@ doQueue = function() {
                           //res.send('Got it!')
                         }
                     }); 
+                    } 
 
                     // *** NEED TO RESIZE 
                     chk = true;
