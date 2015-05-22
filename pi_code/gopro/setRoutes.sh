@@ -25,14 +25,14 @@ fi
 
 ip2="$(ifconfig wlan2 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')"
 if [ -n "$ip2" ]; then
-	ip route add 10.5.5.9 via ${ip2} dev wlan2
+	ip route add 10.5.5.10 via ${ip2} dev wlan2
 	echo "Route to Cam 2 added"
 else 	
 	sudo ifdown wlan2
 	sudo ifup wlan2
 	ip1="$(ifconfig wlan2 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')"
 	if [ -n "$ip2" ]; then
-		ip route add 10.5.5.9 via ${ip2} dev wlan2
+		ip route add 10.5.5.10 via ${ip2} dev wlan2
 		echo "Route to Cam 2 added"
 	else
 		echo "Could not reach Cam 2"
