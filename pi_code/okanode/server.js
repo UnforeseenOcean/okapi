@@ -305,12 +305,12 @@ testConnect = function(callback){
         logger.info("Connected to w1");
         connectedW1 = true;
     }
-    exec('ping -I wlan2 -c 2 10.5.5.9', function(error, stdout, stderr) {
+    exec('ping -I wlan2 -c 2 10.5.5.10', function(error, stdout, stderr) {
       if (error != null){
-        logger.error("Can't connect to w2");
+        logger.error("Can't connect to b2");
         connectedW2 = false;
       } else {
-        logger.info("Connected to w2")
+        logger.info("Connected to b2")
         connectedW2 = true;
       }
       exec('ping -I wlan3 -c 2 10.5.5.9', function(error, stdout, stderr) {
@@ -398,7 +398,7 @@ doQueue = function() {
         }
         if (goproList.length > 1 && !chk) {
 
-            for (var i = 0; i < goproList.length -1; i++) {
+            for (var i = 0; i < goproList.length; i++) {
                 if (goproList[i].indexOf('jpg') != '-1') {
                     logger.log('info', "Found JPG to upload.");
 
