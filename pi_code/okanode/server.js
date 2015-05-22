@@ -406,7 +406,7 @@ doQueue = function() {
 
                     var url = "gopro/" + goproList[i];
 
-                   var stats = fs.statSync(url)
+                   var stats = fs.statSync('./public/uploads/jpg/' + url)
                    var fileSizeInBytes = stats["size"]
                    //Convert the file size to megabytes (optional)
                    var fileSizeInMegabytes = fileSizeInBytes / 1000000.0
