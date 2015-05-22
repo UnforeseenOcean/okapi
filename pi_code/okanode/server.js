@@ -305,7 +305,7 @@ testConnect = function(callback){
         logger.info("Connected to w1");
         connectedW1 = true;
     }
-    exec('ping -I wlan2 -c 2 10.5.5.10', function(error, stdout, stderr) {
+    exec('ping -I wlan2 -c 2 10.5.5.9', function(error, stdout, stderr) {
       if (error != null){
         logger.error("Can't connect to b2");
         connectedW2 = false;
@@ -716,9 +716,15 @@ attemptUploadJSON = function(url) {
                 }
             } else {
                 logger.error("Could not resize file for upload. Archiving instead");
-                archive(url);
-                for (var i = 0; i < json.ResourceURLs.length ; i++) {
-                  archive(filePath + ingestPath + "/" + json.ResourceURLs[i]);
+                var stats = fs.statSync(url)
+                var fileSizeInBytes = stats["size"]
+                //Convert the file size to megabytes (optional)
+                var fileSizeInMegabytes = fileSizeInBytes / 1000000.0
+                if (fileSizeInBytes > 1) {
+                  archive(url);
+                  for (var i = 0; i < json.ResourceURLs.length ; i++) {
+                    archive(filePath + ingestPath + "/" + json.ResourceURLs[i]);
+                  }
                 }
                 sending = false;
             }
