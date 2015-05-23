@@ -1119,11 +1119,10 @@ logger.info("LISTENING ON " + portNum)
 resetNetwork();
 
 //Set up the interval for uploads
-setInterval(doQueue, 1000);
+setInterval(doQueue, 30000);
 setInterval(takePic, picInterval);
 setInterval(doReport, upFreq);
 // Set up interval to check connection status
-setInterval(checkConnection, 1000);
 doReport();
 takePic();
 
