@@ -25,6 +25,8 @@ var Twit        = require('twit');
 var rest        = require('restler');
 var colors      = require('colors');
 
+var failMap = [];
+
 var portNum = 3000;
 
 var reporting = true;
@@ -70,6 +72,9 @@ var connectedW2 = false;
 var checking_connection = false;
 var active_connection   = false;
 var sending             = false;
+
+var successes = []
+var failures = []
 
 //logging
 var logger = new (winston.Logger)({
@@ -160,6 +165,9 @@ getStatus = function() {
   status = {};
   status.upTime = (upCount * upFreq) / 1000;
 
+  status.successes = successes;
+  status.failures = failures;
+
   var today = new Date();
   var dt = today.format("ddmmyy");
 
@@ -184,6 +192,8 @@ getStatus = function() {
   var jsonCount = 0;
   var jsonACount = 0;
   var jsons = [];
+
+  
 
   //JSON
   var allFiles = fs.readdirSync(jQdir);
@@ -262,9 +272,9 @@ getStatus = function() {
   //last images
   var lastA = archiveFolder + "/" + gpA[gpA.length - 1]
 
-  if (lefts.length > 0) status.lastLeft = lefts[0];
-  if (rights.length > 0) status.lastRight = rights[0];
-  if (centers.length > 0) status.lastCenter = centers[0];
+  if (lefts.length > 0) status.lastLeft = lefts[lefts.length - 1];
+  if (rights.length > 0) status.lastRight = rights[rights.length - 1];
+  if (centers.length > 0) status.lastCenter = centers[centers.length - 1];
 
 
   status.gpQCount = gpQc;
@@ -402,16 +412,7 @@ doQueue = function() {
                 if (goproList[i].indexOf('jpg') != '-1') {
                     logger.log('info', "Found JPG to upload.");
 
-
-
                     var url = "gopro/" + goproList[i];
-
-                   var stats = fs.statSync('./public/uploads/jpg/' + url)
-                   var fileSizeInBytes = stats["size"]
-                   //Convert the file size to megabytes (optional)
-                   var fileSizeInMegabytes = fileSizeInBytes / 1000000.0
-
-                   if (fileSizeInMegabytes > 1.0) {
 
                     var outputFilename = './public/uploads/json/gopro_' + goproList[i] + '.json';
 
@@ -431,7 +432,6 @@ doQueue = function() {
                           //res.send('Got it!')
                         }
                     }); 
-                    } 
 
                     // *** NEED TO RESIZE 
                     chk = true;
@@ -658,9 +658,23 @@ attemptUploadJSON = function(url) {
         var r = request.post(uurl, function optionalCallback(err, httpResponse, body) {
           if (err) {
             sending = false;
-            return logger.error('upload failed:', err);
+            if(failMap[json] == undefined) failMap[json] = 0;
+
+            failMap[json] ++;
+            
+
+            if (failMap[json] > 3) {
+              failures.push(json);
+              archive(url);
+               if (rPath) archive(rPath);
+              sending = false;
+            }
+
+            return logger.error('upload failed:' + failMap[json], err);
+
           } else {
             logger.info('Upload successful to ' + uurl + '!  Server responded with:', body);
+            successes.push(json);
             console.log("ARCHIVING " + url);
             archive(url);
             if (rPath) archive(rPath);
@@ -674,12 +688,22 @@ attemptUploadJSON = function(url) {
 
           for (var i = 0; i < json.ResourceURLs.length; i++) {
             rPath = filePath + ingestPath + "/" + json.ResourceURLs[i];
+            console.log(fs.stat(rPath, function(err) {
+              console.log(err);
+              if(err != null && err.code == 'ENOENT') {
+                  logger.error('Could not find attachment file.');
+                  failures.push(json);
+                  archive(url);
+              } else {
+                try {
+                  form.append('resource', fs.createReadStream(rPath));
+                } catch (err) {
+                  console.log("COULDN'T ADD RESOURCE URL.");
+                }
+              }
+            }));
             console.log("ADDING RESOURCE 1:" + rPath);
-            try {
-              form.append('resource', fs.createReadStream(rPath));
-            } catch (err) {
-              console.log("COULDN'T ADD RESOURCE URL.");
-            }
+            
           }
         }
 
@@ -695,9 +719,27 @@ attemptUploadJSON = function(url) {
                 var r = request.post(uurl, function optionalCallback(err, httpResponse, body) {
                   if (err) {
                       sending = false;
-                      return logger.error('upload failed:', err);
+                      //failures.push(json);
+                       console.log(failMap[json])
+                       if(failMap[json] == undefined) failMap[json] = 0;
+            
+                       failMap[json] ++;
+            
+
+                      if (failMap[json] > 3) {
+                        failures.push(json);
+                        archive(url);
+                        for (var i = 0; i < newNames.length; i++) {
+                          archive(newNames[i]);
+                          archive(origPics[i]);
+                        }
+                      }
+
+                      return logger.error('upload failed:' + failMap[json], err);
+                      //return logger.error('upload failed:', err);
                   } else {
                       logger.info('Upload successful to ' + uurl + '!  Server responded with:', body);
+                      successes.push(json);
                       console.log("ARCHIVING " + url);
                       archive(url);
                       for (var i = 0; i < newNames.length; i++) {
@@ -726,15 +768,9 @@ attemptUploadJSON = function(url) {
                 }
             } else {
                 logger.error("Could not resize file for upload. Archiving instead");
-                var stats = fs.statSync(url)
-                var fileSizeInBytes = stats["size"]
-                //Convert the file size to megabytes (optional)
-                var fileSizeInMegabytes = fileSizeInBytes / 1000000.0
-                if (fileSizeInBytes > 1) {
-                  archive(url);
-                  for (var i = 0; i < json.ResourceURLs.length ; i++) {
-                    archive(filePath + ingestPath + "/" + json.ResourceURLs[i]);
-                  }
+                archive(url);
+                for (var i = 0; i < json.ResourceURLs.length ; i++) {
+                  archive(filePath + ingestPath + "/" + json.ResourceURLs[i]);
                 }
                 sending = false;
             }
@@ -759,6 +795,10 @@ archive = function(filePath) {
 	mkdirSync("./public/archive/" + dt + "/tweet");
 
 	var archPath = filePath.replace('uploads', 'archive/' + dt);
+  console.log(fs.stat(archPath, function(err) {
+      console.log(err);
+  }));
+
    try {
   	fs.renameSync(filePath, archPath );
   	logger.info("Archived:" + archPath );
@@ -918,7 +958,7 @@ function saveAttachment(file, name, res) {
         logger.info(tmp_path);
         var ext = file.extension.toLowerCase();
 
-        if (ext == 'wav') {
+        if (ext == 'wav' || ext == 'zip') {
           ext = 'mp3';
           console.log("WAV.");
           console.log(ext);
@@ -1119,10 +1159,11 @@ logger.info("LISTENING ON " + portNum)
 resetNetwork();
 
 //Set up the interval for uploads
-setInterval(doQueue, 30000);
+setInterval(doQueue, 1000);
 setInterval(takePic, picInterval);
 setInterval(doReport, upFreq);
 // Set up interval to check connection status
+setInterval(checkConnection, 1000);
 doReport();
 takePic();
 

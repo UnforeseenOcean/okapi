@@ -77,11 +77,11 @@ $(document).ready(function() {
                 $('#species-button').text('Getting sightings from API...')
                 console.log("Try getting species");
                 //http://intotheokavango.org/api/features/?FeatureType=sighting&order=descending&SpeciesName=Tester+Bird
-                $.getJSON('http://intotheokavango.org/api/features/?Expedition=okavango_15&FeatureType=sighting&order=descending&SpeciesName=' + encodeURI($('#Species').val()), function(data) {
+                $.getJSON('http://intotheokavango.org/api/features/?Expedition=okavango_15&FeatureType=sighting&order=descending&speciesSearch=' + encodeURI($('#Species').val()), function(data) {
                         var buttons = [];
                         for (var i = 0; i < data.results.features.length; i++) {
                             var f = data.results.features[i];
-                            buttons[i] = $('#speciesList').append('<div id="button' + i + '">' + f.properties.DateTime + '</div>');
+                            buttons[i] = $('#speciesList').append('<div id="button' + i + '">' + f.properties.SpeciesName + " - " + f.properties.DateTime + '</div>');
                             $('#button' + i).data('id',f.id ).click(function() {
                                 id = $(this).data('id');
                                 console.log($('#sightingID'));

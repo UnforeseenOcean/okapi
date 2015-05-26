@@ -29,6 +29,11 @@
 <h3 id='json'></h3>
 <h3 id='lastJson'></h3>
 
+<h3>Successes</h3>
+<div id='successes'></div>
+<h3>Failures</h3>
+<div id='failures'></div>
+
 
 
 <script type="text/javascript">
@@ -51,6 +56,18 @@ function updateStatus() {
             var l = data.lastRight;
             var u = l.replace('public/','');
             $('#lastRight').attr('src',u)
+        }
+
+        if (data.successes) {
+            console.log("Successes");
+            console.log(data.successes);
+            $('#successes').html(JSON.stringify(data.successes));
+        }
+
+        if (data.failures) {
+            console.log("Failures");
+            console.log(data.failures);
+            $('#failures').html(JSON.stringify(data.failures));
         }
 
         /*
