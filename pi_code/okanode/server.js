@@ -30,7 +30,7 @@ var failMap = [];
 var portNum = 3000;
 
 var reporting = true;
-var camerasOn = false;
+var camerasOn = true;
 var upCount = -1;
 var upFreq = 5 * 60 * 1000;
 
