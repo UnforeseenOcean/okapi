@@ -19,6 +19,9 @@
 <a href='/sightingUpload'>Sighting/Species Upload</a>
 <br/>
 <br/>
+<h3 id='camerasOn' syle='cursor:pointer'>Cameras Off.</h3><div>(^^^^ Click to toggle)</div>
+<br/>
+<br/>
 
 <img id='lastLeft' width='320px' height='280px'/><img id='lastCenter' width='320px' height='280px'/><img id='lastRight' width='320px' height='280px'/>
 <h3 id='gpQCount'></h3>
@@ -37,10 +40,17 @@
 
 
 <script type="text/javascript">
+
+var camerasOn = false;
 function updateStatus() {
     $.getJSON('/status', function(data) {
 
         console.log(data);
+
+        if (data.camerasOn) {
+            $('#camerasOn').html(data.camerasOn ? "Cameras On.":"Cameras Off.")
+            camerasOn = data.camerasOn;
+        }
 
         if (data.lastLeft) {
             var l = data.lastLeft;
@@ -98,6 +108,27 @@ function updateStatus() {
         }
     })
 }
+
+$('#camerasOn').click(function() {
+    console.log("CLICK");
+    if (camerasOn) {
+        $.ajax('/camerasOff');
+           console.log('switched off')
+           camerasOn = false; 
+           $('#camerasOn').html(camerasOn ? "Cameras On.":"Cameras Off.")
+           //updateStatus();
+        
+    } else {
+        $.ajax('/camerasOn');
+           console.log('switched on.') 
+            camerasOn = true;
+            $('#camerasOn').html(camerasOn ? "Cameras On.":"Cameras Off.")
+           ///updateStatus();
+        
+    }
+    
+});
+
 updateStatus();
 setInterval(updateStatus, 10 * 1000);
 </script>

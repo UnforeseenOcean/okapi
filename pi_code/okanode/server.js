@@ -30,6 +30,7 @@ var failMap = [];
 var portNum = 3000;
 
 var reporting = true;
+var camerasOn = false;
 var upCount = -1;
 var upFreq = 5 * 60 * 1000;
 
@@ -112,6 +113,28 @@ doReport = function() {
 }
 
 //GoPro Stuff
+app.get('/camerasOn', function(req, res){
+   camerasOn = true;
+   res.send('Cameras On.');
+   logger.info('Cameras On.')
+   exec('sudo /home/pi/okapi/pi_code/gopro/./setRoutes.sh', function(error, stdout, stderr) {
+       if (error) {
+          console.log(error)
+       } else if (stderr == ""){
+         logger.info("Restarted network");
+       } else {
+         logger.error("Error restarting network: " + stderr);
+       }
+   });
+});
+
+app.get('/camerasOff', function(req, res){
+   camerasOn = false;
+   res.send('Cameras Off.');
+   logger.info('Cameras Off.')
+});
+
+
 app.get('/takePic', function(req, res){
    exec('/home/pi/okapi/pi_code/gopro/./download_master.sh', function(error, stdout, stderr) {
        res.json({output: stdout, error: stderr});
@@ -167,6 +190,8 @@ getStatus = function() {
 
   status.successes = successes;
   status.failures = failures;
+
+  status.camerasOn = camerasOn;
 
   var today = new Date();
   var dt = today.format("ddmmyy");
@@ -296,6 +321,7 @@ getStatus = function() {
 }
 
 takePic = function(){
+  if (camerasOn) {
     logger.info("Starting the long pic taking process.");
     exec('sudo /home/pi/okapi/pi_code/gopro/./download_master.sh', function(error, stdout, stderr) {
        if (stderr != ""){
@@ -304,6 +330,7 @@ takePic = function(){
         logger.info("Pictures taken");
        }
     });
+  }
 }
 
 testConnect = function(callback){
